@@ -1,0 +1,50 @@
+If we get an error when trying to import or load data into a MongoDB database from a file.json using the 'mongoimport' command on the bash shell.
+
+Error:
+====
+mongoimport --db=databaseName --collection=collectionName --file=file.json
+2024-09-13T18:31:04.413+0200    connected to: mongodb://localhost/
+2024-09-13T18:31:04.413+0200    Failed: cannot decode array into a primitive.D
+2024-09-13T18:31:04.413+0200    0 document(s) imported successfully. 0 document(s) failed to import.
+
+The error message cannot decode array into a primitive.D indicates that 'mongoimport' is expecting a series of documents, but it’s encountering an array of objects instead. MongoDB expects each JSON document to be on its own line when using 'mongoimport'.
+
+
+Solutions:
+========
+
+We need to format the JSON file so that each object is treated as a separate document. There are two ways to fix this:
+
+1. Remove the array wrapper:
+============================
+Instead of having the entire JSON wrapped in an array, make each object its own JSON document. The correct format for mongoimport is:
+
+Correct format:
+===============
+Remove the outer [] array brackets from your JSON file.
+Make sure each object ({...}) is on a separate line, as shown below.
+Make sure there are no trailing commas after a closing bracket or the last key: value pair in the document
+
+{ "key": 1, "name": "Drama" }
+{ "key": 2, "name": "Mystery" }
+
+OR
+
+{
+	"key": 3,
+	"name": "Adventure"
+}
+{
+	"key": 4,
+	"name": "Fantasy"
+}
+
+----------------------
+
+2. Use the '--jsonArray' flag:
+==============================
+If you prefer to keep the array structure in your JSON file, you can tell 'mongoimport' to treat the input as an array of documents by using the '--jsonArray' option:
+
+mongoimport --db=databaseName --collection=collectionName --file=data.json --jsonArray
+
+This will import each object within the array as a separate document in the 'collectionName' collection
